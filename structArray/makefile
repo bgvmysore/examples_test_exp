@@ -1,5 +1,14 @@
 CC = gcc
-CFLAGS = -Wall -g -O0 -std=c99
+
+ifeq ($(CC), cl)
+		CFLAGS = -W1
+		COUT = /Fe:
+		CLEANUPOBJ = del *.obj
+else
+		CFLAGS = -Wall -g -O0 -std=c99
+		COUT = -o
+		CLEANUPOBJ = @echo DONE
+endif
 
 PROJECT = StructArray
 SRC = $(wildcard src/*.c)
@@ -11,17 +20,18 @@ TEST_SRC =
 INC = -Iinc
 
 ifeq ($(OS),Windows_NT)
-	RM = del
-	EXEC = $(BIN)\$(PROJECT).exe
-	EXEC_TEST = $(BIN)\tests_$(PROJECT).exe
+		RM = del
+		EXEC = $(BIN)\$(PROJECT).exe
+		EXEC_TEST = $(BIN)\tests_$(PROJECT).exe
 else
-	RM = rm
-	EXEC = $(BIN)/$(PROJECT).out
-	EXEC_TEST = $(BIN)/tests_$(PROJECT).out
+		RM = rm
+		EXEC = $(BIN)/$(PROJECT).out
+		EXEC_TEST = $(BIN)/tests_$(PROJECT).out
 endif
 
 $(EXEC): $(SRC)
-	$(CC) $(CFLAGS) $(INC) $^ -o $@
+	$(CC) $(CFLAGS) $(INC) $^ $(COUT)$@
+	$(CLEANUPOBJ)
 
 run: $(EXEC)
 	./$(EXEC)
